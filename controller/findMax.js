@@ -5,5 +5,7 @@ module.exports.findMax = function(req, res) {
     var n4 = parseInt(req.body.n4)
     var n5 = parseInt(req.body.n5)
     var max = Math.max(n1, n2, n3, n4, n5)
+    var arr = [n1, n2, n3, n4, n5]
+    console.log(arr)
     res.json({ max: max })
 }
