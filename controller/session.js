@@ -32,7 +32,7 @@ function signup(req, res) {
         })
         return
     }
-    if(!validator.isEmail(email)) {
+    if(!validator.isEmail(email)) { 
         res.json({
             "message": "Invalid email"
         })
