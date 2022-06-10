@@ -10,10 +10,10 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', function (req, res) {
     res.send('Hello World');
 });
-app.get('/login', session.login)
-app.get('/forgetPassword', session.forgetPassword)
+app.post('/login', session.login)
+app.post('/forgetPassword', session.forgetPassword)
 app.post('/signup', session.signup)
-
+app.post('/resetPassword', session.resetPassword)
 
 app.post('/add', calc.add)
 app.post('/sub', calc.sub)
