@@ -12,8 +12,9 @@ app.get('/', function (req, res) {
 });
 app.get('/login', session.login)
 app.get('/forgetPassword', session.forgetPassword)
+app.post('/signup', session.signup)
 
- 
+
 app.post('/add', calc.add)
 app.post('/sub', calc.sub)
 
