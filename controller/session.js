@@ -5,7 +5,7 @@ function login(req, res) {
 
 function forgetPassword(req, res) {
     res.send("Forget Password Page")
-}
+} 
 let users = [{
     "firstName": "John",
     "email" : "john@gmail.com",
