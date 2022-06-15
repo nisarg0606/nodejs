@@ -1,55 +1,16 @@
 const validator = require('validator');
-function login(req, res) {
-    let email = req.body.email
-    let password = req.body.password
-    let isError = false
-    let errorMessage = []
-    if (email == undefined || email.trim().length == 0) {
-        isError = true
-        errorMessage.push('Email is required')
-    }
-    if (password == undefined || password.trim().length == 0) {
-        isError = true
-        errorMessage.push('Password is required')
-    }
-    if (isError) {
-        res.json({
-            status: -1,
-            message: errorMessage
-        })
-        return
-    }
-    else {
-        let user = users.find(user => user.email === email)
-        if (user) {
-            if (user.password === password) {
-                res.json({
-                    status: 1,
-                    message: 'Login success',
-                    user: user
-                })
-                console.log(user.email);
-            }
-            else {
-                res.json({
-                    status: -1,
-                    message: 'Password is incorrect'
-                })
-            }
-        }
-        else {
-            res.json({
-                status: -1,
-                message: 'Email is incorrect'
-            })
-        }
-    }
+const passwordValidator = require('password-validator');
 
-}
+var schema = new passwordValidator();
+schema
+    .is().min(8)
+    .is().max(15)
+    .has().uppercase()
+    .has().lowercase()
+    .has().digits()
+    .has().not().spaces()
+    .is().not().oneOf(['Passw0rd', 'Password123']);
 
-function forgetPassword(req, res) {
-    res.send("Forget Password Page")
-}
 let users = [{
     "firstName": "John",
     "email": "john@gmail.com",
@@ -63,6 +24,27 @@ let users = [{
     "userId": 2
 }]
 
+//valid email
+function validEmail(email) {
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].email === email) {
+            return users[i];
+        }
+    }
+    return false;
+}
+
+//valid Email and Password
+function validEmailAndPassword(email, password) {
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].email === email && users[i].password === password) {
+            return true;
+        }
+    }
+    return false;
+}
+
+//signup
 function signup(req, res) {
     let firstName = req.body.firstName
     let email = req.body.email
@@ -82,32 +64,36 @@ function signup(req, res) {
             "emailError": "Please Enter Email"
         })
     } else {
-
         if (!validator.isEmail(email)) {
             isError = true
             errorMessage.push({ "emailError": "Please Enter Valid Email" })
         }
     }
-    if (password == undefined || password.trim().length == 0) {
+    // if (password == undefined || password.trim().length == 0) {
+    //     isError = true
+    //     errorMessage.push({ "passwordError": "Please Enter Password" })
+    // } if (!validator.isAlphanumeric(password)  || !validator.isLength(password, { min: 8 })) {
+    //     isError = true
+    //     errorMessage.push({ "passwordError": "Password must be alphanumeric and Password must be at least 8 characters" })
+    // }
+    if(schema.validate(password) == false){
         isError = true
-        errorMessage.push({ "passwordError": "Please Enter Password" })
-    } else {
-        if (!validator.isLength(password, { min: 8 })) {
-            isError = true
-            errorMessage.push("Password must be at least 8 characters")
-        }
+        errorMessage.push({ "passwordError": "Password must be contain 1 uppercase, 1 lower case, 1 number and it must be at least 8 characters" })
     }
+    
     if (isError) {
         res.json({
             "error": errorMessage,
             "status": -1,
-            "msg": "Validation error"
+            "msg": "Validation error",
+            "user": req.body
         })
         return
     }
     else {
         //check if user already exists
-        let user = users.find(user => user.email === email)
+        // let user = users.find(user => user.email === email)      // short method
+        let user = validEmail(email)
         if (user) {
             res.json({
                 "message": "User already exists"
@@ -130,6 +116,47 @@ function signup(req, res) {
     }
 }
 
+//login
+function login(req, res) {
+    let email = req.body.email
+    let password = req.body.password
+    let isError = false
+    let errorMessage = []
+    if (email == undefined || email.trim().length == 0) {
+        isError = true
+        errorMessage.push('Email is required')
+    }
+    if (password == undefined || password.trim().length == 0) {
+        isError = true
+        errorMessage.push('Password is required')
+    }
+    if (isError) {
+        res.json({
+            status: -1,
+            message: errorMessage
+        })
+        return
+    }
+    else {
+        // let user = users.find(user => user.email === email)
+        if (validEmailAndPassword(email, password)) {
+            res.json({
+                status: 1,
+                message: 'Login success',
+                user: req.body
+            })
+            console.log(req.body.email);
+        }
+        else {
+            res.json({
+                status: -1,
+                message: 'Password or Email is incorrect'
+            })
+        }
+    }
+}
+
+//forgot password
 function forgetPassword(req, res) {
     let email = req.body.email
     let isError = false
@@ -146,7 +173,8 @@ function forgetPassword(req, res) {
         return
     }
     else {
-        let user = users.find(user => user.email === email)
+        // let user = users.find(user => user.email === email)
+        let user = validEmail(email)
         if (user) {
             let index = users.indexOf(user)
             users[index].otp = Math.floor(Math.random() * 1000000)
@@ -156,8 +184,16 @@ function forgetPassword(req, res) {
                 user: user
             })
         }
+        else {
+            res.json({
+                status: -1,
+                message: 'Email is incorrect'
+            })
+        }
     }
 }
+
+//Reset Password
 function resetPassword(req, res) {
     let email = req.body.email
     let otp = req.body.otp
@@ -172,28 +208,34 @@ function resetPassword(req, res) {
         isError = true
         errorMessage.push('OTP is required')
     } else {
-        let user = users.find(user => user.email === email)
+        // let user = users.find(user => user.email === email)
+        let user = validEmail(email)
         let index = users.indexOf(user)
-        if(user.otp == -1)
-        {
+        if (user.otp == -1) {
             res.json({
                 status: -1,
                 message: 'OTP is expired'
             })
         }
-        if (otp != users[index].otp) {
+        else if (otp != users[index].otp) {
             isError = true
-            errorMessage.push('OTP is incorrect')
+            errorMessage.push('OTP or email is incorrect')
         }
         else {
-            // delete users[index].otp
-            users[index].otp = -1
-            users[index].password = password
-            res.json({
-                status: 1,
-                message: 'Password updated successfully',
-                user: user
-            })
+            if (!validator.isLength(password, { min: 8 })) {
+                isError = true
+                errorMessage.push("Password must be at least 8 characters")
+            }
+            else {
+                // delete users[index].otp
+                users[index].otp = -1
+                users[index].password = password
+                res.json({
+                    status: 1,
+                    message: 'Password updated successfully',
+                    user: user
+                })
+            }
         }
     }
     if (password == undefined || password.trim().length == 0) {
@@ -207,6 +249,15 @@ function resetPassword(req, res) {
         })
         return
     }
+}
+
+//get all users
+module.exports.getAllUsers = function (req, res) {
+    res.json({
+        status: 200,
+        message: 'All Users',
+        users: users
+    })
 }
 module.exports.login = login
 module.exports.forgetPassword = forgetPassword

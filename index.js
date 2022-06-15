@@ -14,6 +14,7 @@ app.post('/login', session.login)
 app.post('/forgetPassword', session.forgetPassword)
 app.post('/signup', session.signup)
 app.post('/resetPassword', session.resetPassword)
+app.get('/getAllUsers', session.getAllUsers)
 
 app.post('/add', calc.add)
 app.post('/sub', calc.sub)
