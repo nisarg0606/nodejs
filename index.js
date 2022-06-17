@@ -39,6 +39,7 @@ app.post('/log', sessionController.login)
 app.post('/forget', sessionController.forgetPassword)
 app.post('/reset', sessionController.resetPassword)
 app.post('/delete', sessionController.deleteUser)
+app.get('/getUser', sessionController.getUser)
 
 //start server
 app.listen(8080, function () {

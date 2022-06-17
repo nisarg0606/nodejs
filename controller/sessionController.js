@@ -40,6 +40,28 @@ module.exports.getAllUsers = function (req, res) {
     })
 }
 
+
+module.exports.getUser = function (req, res) {
+    UserModel.findOne({
+        email: req.body.email
+    }, function (err, data) {
+        if (err) {
+            console.log("Error in getting user");
+            res.json({
+                status: -1,
+                message: err
+            })
+        } else {
+            res.json({
+                status: 200,
+                message: 'User fetched successfully',
+                success: data
+            })
+        }
+    })
+}
+
+
 module.exports.login = function (req, res) {
     let email = req.body.email
     let password = req.body.password
