@@ -1,5 +1,7 @@
 const UserModel = require('../model/userModel');
 
+
+//signup --> start
 module.exports.signup = function (req, res) {
     let user = new UserModel({
         firstName: req.body.firstName,
@@ -20,8 +22,10 @@ module.exports.signup = function (req, res) {
             })
         }
     })
-}
+} //signup --> end
 
+
+//Get all users --> start
 module.exports.getAllUsers = function (req, res) {
     UserModel.find(function (err, data) {
         if (err) {
@@ -39,8 +43,10 @@ module.exports.getAllUsers = function (req, res) {
         }
     })
 }
+// Get all users --> end
 
 
+//Get user by id/email --> start
 module.exports.getUser = function (req, res) {
     UserModel.findOne({
         email: req.body.email
@@ -60,8 +66,10 @@ module.exports.getUser = function (req, res) {
         }
     })
 }
+//Get user by id/email --> end
 
 
+//login --> start
 module.exports.login = function (req, res) {
     let email = req.body.email
     let password = req.body.password
@@ -117,7 +125,9 @@ module.exports.login = function (req, res) {
         )
     }
 }
+//login --> end
 
+//forgot password --> start
 module.exports.forgetPassword = function (req, res) {
     let email = req.body.email;
     let isError = false;
@@ -161,7 +171,9 @@ module.exports.forgetPassword = function (req, res) {
         )
     }
 }
+//forgot password --> end
 
+//reset password --> start
 module.exports.resetPassword = function (req, res) {
     let email = req.body.email
     let otp = req.body.otp
@@ -241,7 +253,9 @@ module.exports.resetPassword = function (req, res) {
         )
     }
 }
+//reset password --> end
 
+//delete user --> start
 module.exports.deleteUser = function (req, res) {
     let email = req.body.email
     let password = req.body.password
@@ -297,3 +311,4 @@ module.exports.deleteUser = function (req, res) {
         )
     }
 }
+//delete user --> end
